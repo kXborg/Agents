@@ -4,13 +4,11 @@ This is a custom branch forked from [kXborg/Agents](https://github.com/kXborg/Ag
 
 ---
 
-## What’s the Goal?
+## What’s Included?
 
-- Provide **4 beginner-level scripts** that illustrate core LangGraph concepts: *states, tools, nodes*  
-- Provide **2 end-to-end agentic applications**.
-- Serve as a learning ladder: from minimal illustrative code to real-world agent examples.  
-- Make it easier for newcomers to get started with LangGraph without being overwhelmed by a large, monolithic repo. 
-
+- **4 beginner-level scripts** that illustrate core LangGraph concepts: *states, tools, nodes*  
+- **2 end-to-end agentic applications**.
+- Minimal illustrative code along with real-world agent examples.  
 ---
 
 ## Repository Structure
@@ -29,10 +27,6 @@ Here’s a suggested structure:
     ├── langGraph-103.py
     └── langGraph-104.py
 ```
-- **starting_with_langGraph/**: minimal LangGraph concept scripts to start understanding states, tools, nodes etc.
-- **scripts/**: full agents implementation. 
-- **requirements.txt**: Python dependencies (langchain, langgraph, playwright, etc.).
-
 ---
 
 ## Getting Started
