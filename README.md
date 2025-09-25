@@ -62,7 +62,6 @@ Here’s a suggested structure:
 
 - *Building an Agentic Browser with LangGraph: A Visual Automation & Summarization Pipeline*: [LearnOpenCV](https://learnopencv.com/langgraph-building-a-visual-web-browser-agent/).
 - *LangGraph Self-Correcting Agent / Code Generation*: [LearnOpenCV](https://learnopencv.com/langgraph-self-correcting-agent-code-generation/)
-- Original upstream repo: [kXborg/Agents](https://github.com/kXborg/Agents?utm_source=chatgpt.com) [GitHub](https://github.com/kXborg/Agents)
 
 These articles help explain the logic behind the advanced agents and are good companion reading.
 
