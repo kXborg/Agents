@@ -2,25 +2,21 @@
 
 This is a custom branch forked from [kXborg/Agents](https://github.com/kXborg/Agents).
 
-It’s tailored for learners and practitioners who want to build agents using **LangGraph**, with clear, minimal examples and two in-depth advanced agent scripts.
-
 ---
 
 ## What’s the Goal?
 
 - Provide **4 beginner-level scripts** that illustrate core LangGraph concepts: *states, tools, nodes*  
-- Provide **2 advanced agent scripts** based on published tutorials:
-  1. *Building a Visual Web Browser Agent* (using screenshots, scroll logic, summarization) :contentReference[oaicite:1]{index=1}  
-  2. *Self-Correcting Agent / Code Generation Agent* (as per LearnOpenCV article)  
-- Serve as a learning ladder: from minimal illustrative code to more complete, real-world agent examples  
-- Make it easier for newcomers to get started with LangGraph without being overwhelmed by a large, monolithic repo  
+- Provide **2 end-to-end agentic applications**.
+- Serve as a learning ladder: from minimal illustrative code to real-world agent examples.  
+- Make it easier for newcomers to get started with LangGraph without being overwhelmed by a large, monolithic repo. 
 
 ---
 
 ## Repository Structure
 
 Here’s a suggested structure:
-
+```
 ├── README.md
 ├── requirements.txt
 ├── scripts
@@ -32,10 +28,10 @@ Here’s a suggested structure:
     ├── langGraph-102.py
     ├── langGraph-103.py
     └── langGraph-104.py
-
-- **starting_with_langGraph/**: minimal examples each focusing on one LangGraph concept  
-- **scripts/**: full agents implementing the logic from the LearnOpenCV tutorials  
-- **requirements.txt**: the Python dependencies (langchain, langgraph, playwright, etc.)
+```
+- **starting_with_langGraph/**: minimal LangGraph concept scripts to start understanding states, tools, nodes etc.
+- **scripts/**: full agents implementation. 
+- **requirements.txt**: Python dependencies (langchain, langgraph, playwright, etc.).
 
 ---
 
