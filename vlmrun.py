@@ -10,7 +10,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 pyautogui.PAUSE = 2.5
 pyautogui.FAILSAFE = True
 
-client = genai.Client(api_key="AIzaSyB6caWuNx4uYKrNXQWVgXzJOcGxIJdJYSs")
+client = genai.Client()
 
 
 def load_model(model_name):
