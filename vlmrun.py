@@ -51,22 +51,17 @@ def grab_click(query, model):
 def main():
     model = load_model("moondream/moondream3-preview")
 
-    grab_click("WhatsApp Icon", model)
-    grab_click("Sovit DeepVidya", model)
+    # grab_click("WhatsApp Icon", model)
+    # grab_click("Kukil Kashyap Borgohain", model)
 
     screenshot = ImageGrab.grab()
 
-    capt = model.query(screenshot, "What do you think about Sovit's profile pic?")
+    capt = model.query(screenshot, "Has the model completed 10 epochs, if yes check accuracy?")
     ans = capt["answer"]
     print(ans)
 
-    greet_text = "Hi this is my first attempt on Agents!"
-
-    pyautogui.typewrite(greet_text, interval=0.05)
-    pyautogui.press("enter")
-
-    pyautogui.typewrite(ans, interval=0.05)
-    pyautogui.press("enter")
+    # pyautogui.typewrite(ans, interval=0.05)
+    # pyautogui.press("enter")
 
 
 if __name__ == '__main__':
