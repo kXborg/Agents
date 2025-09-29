@@ -2,7 +2,7 @@ import io
 import pyautogui
 from google import genai
 
-client = genai.Client(api_key="AIzaSyB6caWuNx4uYKrNXQWVgXzJOcGxIJdJYSs")
+client = genai.Client(api_key="AIzaSyBBSLU77PES2mVDy049pvwppKe-HVFJrzo")
 
 # Capture screenshot
 screenshot = pyautogui.screenshot()
@@ -19,7 +19,7 @@ response = client.models.generate_content(
         {
             "role": "user",
             "parts": [
-                {"text": "is the model training complete in the jupyter notebook? Answer in Yes or No."},
+                {"text": "Describe the image in 100 words"},
                 {"inline_data": {"mime_type": "image/png", "data": img_bytes}},
             ],
         }
@@ -27,3 +27,14 @@ response = client.models.generate_content(
 )
 
 print(response.text)
+
+
+# from google.api_core.client_options import ClientOptions
+# from google.generativeai import Client as GAClient
+
+# api_key = "AIzaSyBBSLU77PES2mVDy049pvwppKe-HVFJrzo"
+# client = GAClient(api_key=api_key)
+
+# # Test a simple request
+# response = client.generate_text(prompt="Hello world", max_output_tokens=10)
+# print(response.text)
