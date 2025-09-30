@@ -3,6 +3,7 @@ import re
 import time
 import json
 import torch
+import argparse
 import pyautogui
 from actions import *
 from google import genai
@@ -17,6 +18,13 @@ pyautogui.FAILSAFE = True
 
 # Store outputs from actions
 action_outputs = defaultdict(dict)
+
+predefined_paths = {
+    "whatsapp": "whatsapp://",
+    "chrome": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+    "edge": "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",
+    "sublime text": "C:/Program Files/Sublime Text 3/sublime_text.exe"
+}
 
 
 # Placeholder: Gemini 2.5 Flash
@@ -61,22 +69,20 @@ def get_action_plan(client, prompt):
       - clear_field()
       - launch_app(path)
       - sleep(seconds=None)
+      - scroll(amount)
 
     Pre-defined paths (args) for launch_app action:
       - "whatsapp" → will resolve to whatsapp://
       - "chrome"   → C:/Program Files/Google/Chrome/Application/chrome.exe
       - "edge"     → C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe
-      - "sublime"  → C:/Program Files/Sublime Text/sublime_text.exe
-      - "slack"    → C:/Users/<YourUser>/AppData/Local/slack/slack.exe
-      - "telegram" → C:/Users/<YourUser>/AppData/Roaming/Telegram Desktop/Telegram.exe
-      - "vscode"   → C:/Users/<YourUser>/AppData/Local/Programs/Microsoft VS Code/Code.exe
+      - "sublime text" → "C:/Program Files/Sublime Text 3/sublime_text.exe"
 
-
-    Apps other than predefined paths are to be searched onscreen or searched from start menu. Understanding image is for Gemini and locating objects P(x,y) is for Moondream.
-    Sleep time is in seconds. Always start by capturing screen, analysing what's on it, then move on to the next actions. Screen capture for image processing functions are inbuilt using PIL.
-    For whatsApp or Google Chrome, once the app is open, you can start typing name directly. It will type in the search bar. No need to locate the search bar. 
-    But make sure to locate Name(with round profile pic on left) before sending message. Add 2s delay after opening the application.
-
+    Apps other than predefined paths are to be searched onscreen or searched from start menu.
+    Sleep time is in seconds. Always start by capturing screen, analysing what's on it, then move on to the next actions. 
+    Add 2s delay after opening the application. For WhatsApp or Chrome or Telegram or other chat apps, once the app is open, start typing the user name directly. Press down arrow, enter, then type message.
+    
+    IMPORTANT: Any information retrieved from 'read_text_from_image_gemini' should be referenced in subsequent actions using the placeholder <OUTPUT_FROM_read_text_from_image_gemini>. Do NOT write fixed summaries. This placeholder will be replaced at runtime with the actual output.
+    
     Each action must be a JSON object with keys:
       - "action": action name
       - "args": dictionary of arguments for that action
@@ -98,11 +104,7 @@ def get_action_plan(client, prompt):
     # Access text properly
     try:
         raw_text = response.candidates[0].content.parts[0].text.strip()
-
-        # Remove Markdown fences if present
         raw_text = re.sub(r"^```(?:json)?|```$", "", raw_text, flags=re.MULTILINE).strip()
-
-        # Now directly parse JSON
         action_plan = json.loads(raw_text)
 
         # Validate schema
@@ -114,17 +116,17 @@ def get_action_plan(client, prompt):
 
     except Exception as e:
         print("❌ Error generating action plan:", e)
-        print("Response text:", raw_text[:500])  # preview first 500 chars
+        print("Response text:", raw_text[:500])
         return []
-
 
 
 def substitute_vars(arg_value):
     """
-    Replace placeholders like {{var_name}} or {{var_name.key}} with actual values from action_outputs.
-    Works recursively for lists and dicts.
+    Replace placeholders like {{var_name}} or <OUTPUT_FROM_read_text_from_image_gemini> 
+    with actual values from action_outputs. Works recursively for lists and dicts.
     """
     if isinstance(arg_value, str):
+        # Replace {{var_name}} style placeholders
         matches = re.findall(r"{{(.*?)}}", arg_value)
         for m in matches:
             parts = m.split(".")
@@ -134,14 +136,20 @@ def substitute_vars(arg_value):
             if key:
                 value = value.get(key, "")
             arg_value = arg_value.replace(f"{{{{{m}}}}}", str(value))
+        
+        # Replace special <OUTPUT_FROM_read_text_from_image_gemini> placeholder
+        if "<OUTPUT_FROM_read_text_from_image_gemini>" in arg_value:
+            gemini_output = action_outputs.get("read_text_from_image_gemini", {}).get("text", "")
+            arg_value = arg_value.replace("<OUTPUT_FROM_read_text_from_image_gemini>", gemini_output)
+
         return arg_value
+
     elif isinstance(arg_value, list):
         return [substitute_vars(v) for v in arg_value]
     elif isinstance(arg_value, dict):
         return {k: substitute_vars(v) for k, v in arg_value.items()}
     else:
         return arg_value
-
 
 
 def execute_actions(action_plan):
@@ -153,7 +161,7 @@ def execute_actions(action_plan):
         args = step.get("args", {})
         output_var = step.get("output")  # Optional output variable
 
-        # Substitute variables in args
+        # Substitute variables in args (handles dynamic placeholders)
         args = {k: substitute_vars(v) for k, v in args.items()}
 
         try:
@@ -161,7 +169,7 @@ def execute_actions(action_plan):
 
             if action_name == "click_target":
                 target = args["target"]
-                coords = locate_object_moondream(target_obj, moondream)
+                coords = locate_object_moondream(target, moondream)
                 if coords:
                     click(coords["x"], coords["y"])
                     result = coords
@@ -169,7 +177,7 @@ def execute_actions(action_plan):
                     print(f"❌ Could not locate {target}")
 
             elif action_name == "read_text_from_image_gemini":
-                query = args.get("prompt", "")
+                query = args.get("query", "")
                 result_text = read_text_from_image_gemini(client, query)
                 result = {"text": result_text}
 
@@ -183,6 +191,14 @@ def execute_actions(action_plan):
                 launch_app(app_path)
                 result = {"status": "launched"}
 
+            elif action_name == "hotkey":
+                keys = args.get("keys", [])
+                if isinstance(keys, list):
+                    pyautogui.hotkey(*keys)
+                    result = {"pressed": keys}
+                else:
+                    print(f"❌ Invalid keys argument for hotkey: {keys}")
+
             else:
                 # Map to local functions if available
                 func = globals().get(action_name)
@@ -191,9 +207,13 @@ def execute_actions(action_plan):
                 else:
                     print(f"⚠️ Unknown action: {action_name}")
 
-            # Store result in outputs if specified
+            # Store result in outputs
             if output_var:
                 action_outputs[output_var] = result
+            else:
+                # Auto-store output from Gemini read if special action
+                if action_name == "read_text_from_image_gemini":
+                    action_outputs["read_text_from_image_gemini"] = result
 
             print(f"✅ Executed {action_name}, output: {result}")
 
@@ -201,23 +221,92 @@ def execute_actions(action_plan):
             print(f"❌ Error executing {action_name}: {e}")
 
 
+# # Example Usage
+# if __name__ == "__main__":
+#     time.sleep(0.5)
+#     # Load Gemini Client
+#     client = genai.Client()
 
-# Example Usage
+#     # Load Moondream 3 preview Model
+#     model_name = "moondream/moondream3-preview"
+#     moondream = AutoModelForCausalLM.from_pretrained(model_name, trust_remote_code=True, dtype=torch.bfloat16, device_map={"": "cuda"})
+#     moondream.compile()
+
+#     # Task prompt
+#     # task_to_do = "Hi please check if classifier training is complete from the jupyter notebook on screen, if yes text Kukil Kashyap Borgohain on WhatsApp and share training report."
+#     # task_to_do = "Hi, summarise whatever is there on screen in 100 words and save as a text file on sublime then send the same summary to Kukil Kashyap Borgohain on WhatsApp"
+#     task_to_do = "Hi, please write a python script to load and display image using opencv on sublime text and save it as .py file"
+
+#     # Get action plan from Gen Model
+#     action_pln = get_action_plan(client, task_to_do)
+#     print(action_pln)
+
+#     execute_actions(action_pln)
+
+
+def locate_object_moondream(target_obj, model):
+    """
+    Locate an object with Moondream and return the first detected point.
+    """
+    # Capture current screen
+    screen_capture = ImageGrab.grab()  # PIL image
+    height, width = screen_capture.height, screen_capture.width
+    screen_capture.save("screen.png")
+
+    # Ask Moondream to locate the target object
+    response = model.point(screen_capture, target_obj)
+    print("Model response:", response)
+
+    try:
+        points = response.get("points", [])
+        if not points:
+            raise ValueError("No points returned")
+
+        # Pick the first point
+        point = points[0]
+
+        abs_x = int(point['x'] * width)
+        abs_y = int(point['y'] * height)
+
+        return {"x": abs_x, "y": abs_y}
+
+    except Exception as e:
+        print("Could not parse response. Got:", response, "Error:", e)
+        return None
+
+
 if __name__ == "__main__":
+    # 0. Small startup delay
     time.sleep(0.5)
-    # Load Gemini Client
+
+    # 1. Argument parser
+    parser = argparse.ArgumentParser(description="Agentic Action Plan Executor")
+    parser.add_argument(
+        "--task",
+        type=str,
+        required=True,
+        help="Task prompt in natural language, e.g., 'Summarize screen content and send report via WhatsApp'"
+    )
+    args = parser.parse_args()
+    task_to_do = args.task
+
+    # 2. Load Gemini Client
     client = genai.Client()
 
-    # Load Moondream 3 preview Model
+    # 3. Load Moondream 3 preview Model
     model_name = "moondream/moondream3-preview"
-    moondream = AutoModelForCausalLM.from_pretrained(model_name, trust_remote_code=True, dtype=torch.bfloat16, device_map={"": "cuda"})
+    moondream = AutoModelForCausalLM.from_pretrained(
+        model_name,
+        trust_remote_code=True,
+        dtype=torch.bfloat16,
+        device_map={"": "cuda"}
+    )
     moondream.compile()
 
-    # Task prompt
-    task_to_do = "Hi please check in 5s interval if classifier training is complete from the jupyter notebook on screen, if yes text Kukil Kashyap Borgohain on WhatsApp and share training statistics."
-
-    # Get action plan from Gen Model
+    # 4. Get action plan from Gemini
+    print("📝 Generating action plan ...")
     action_pln = get_action_plan(client, task_to_do)
-    print(action_pln)
+    print("📋 Action plan:", action_pln)
 
+    # 5. Execute actions
     execute_actions(action_pln)

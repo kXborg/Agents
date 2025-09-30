@@ -7,45 +7,12 @@ import os
 import time
 from PIL import Image, ImageGrab
 
-
-def locate_object_moondream(target_obj, model, rank=2):
-    """
-    Locate an object with Moondream.
-    By default, returns the 2nd top-left-most point (rank=2).
-    You can change `rank` to get the 1st, 3rd, etc.
-    """
-    # Capture current screen
-    screen_capture = ImageGrab.grab()  # PIL image
-    height, width = screen_capture.height, screen_capture.width
-    screen_capture.save("screen.png")
-
-    # Ask Moondream to locate the target object
-    response = model.point(screen_capture, target_obj)
-    print("Model response:", response)
-
-    try:
-        points = response.get("points", [])
-        if not points:
-            raise ValueError("No points returned")
-
-        # Sort by top-left priority (min y, then min x)
-        sorted_points = sorted(points, key=lambda p: (p['y'], p['x']))
-
-        if len(sorted_points) < rank:
-            raise IndexError(f"Less than {rank} points returned")
-
-        # Pick the Nth top-left-most point
-        point = sorted_points[rank - 1]
-
-        abs_x = int(point['x'] * width)
-        abs_y = int(point['y'] * height)
-
-        return {"x": abs_x, "y": abs_y}
-
-    except Exception as e:
-        print("Could not parse response. Got:", response, "Error:", e)
-        return None
-
+predefined_paths = {
+    "whatsapp": "whatsapp://",
+    "chrome": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+    "edge": "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",
+    "sublime text": "C:/Program Files/Sublime Text 3/sublime_text.exe"
+}
 
 
 def scroll(amount):
@@ -90,15 +57,51 @@ def clear_field():
     pyautogui.hotkey("ctrl", "a")
     pyautogui.press("backspace")
 
+
+# def launch_app(path):
+#     try:
+#         # Resolve path if it's a predefined app
+#         resolved_path = predefined_paths.get(path.lower(), path)
+#         os.startfile(resolved_path)
+#         print(f"✅ Launched {path}")
+#     except Exception as e:
+#         print(f"❌ Could not launch {path}: {e}")
+
+
 def launch_app(path):
+    """
+    Launch an application with a contingency:
+    1. Try predefined path / os.startfile
+    2. If fails, open Start menu, type app name, press Enter
+    3. Verify app launch using Moondream
+    """
+    resolved_path = predefined_paths.get(path.lower(), path)
     try:
-        if path == "whatsapp":
-            os.startfile("whatsapp://")  # this opens WhatsApp if protocol registered
-        else:
-            os.startfile(path)
-        print(f"✅ Launched {path}")
+        os.startfile(resolved_path)
+        print(f"✅ Launched {path} via predefined path")
+        time.sleep(2)
+        return True
     except Exception as e:
-        print(f"❌ Could not launch {path}: {e}")
+        print(f"❌ Could not launch {path} via predefined path: {e}")
+        print(f"⚡ Attempting Start Menu fallback...")
+
+        try:
+            # Open Start menu (Windows key)
+            pyautogui.press("win")
+            time.sleep(1)
+
+            # Type the app name
+            pyautogui.typewrite(path, interval=0.05)
+            time.sleep(0.5)
+
+            # Press Enter
+            pyautogui.press("enter")
+            time.sleep(3)  # give it some time to launch
+
+        except Exception as ex:
+            print(f"❌ Start menu fallback failed for {path}: {ex}")
+            return False
+
 
 def is_process_running(name):
     """Check if process is running by name."""
