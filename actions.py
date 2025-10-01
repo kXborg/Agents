@@ -5,6 +5,7 @@ import pytesseract
 import psutil
 import os
 import time
+import platform
 from PIL import Image, ImageGrab
 
 predefined_paths = {
@@ -14,9 +15,7 @@ predefined_paths = {
     "sublime text": "C:/Program Files/Sublime Text 3/sublime_text.exe"
 }
 
-
 def scroll(amount):
-    """Scroll vertically (positive=up, negative=down)."""
     pyautogui.scroll(amount)
 
 
@@ -58,53 +57,59 @@ def clear_field():
     pyautogui.press("backspace")
 
 
-# def launch_app(path):
-#     try:
-#         # Resolve path if it's a predefined app
-#         resolved_path = predefined_paths.get(path.lower(), path)
-#         os.startfile(resolved_path)
-#         print(f"✅ Launched {path}")
-#     except Exception as e:
-#         print(f"❌ Could not launch {path}: {e}")
-
-
 def launch_app(path):
-    """
-    Launch an application with a contingency:
-    1. Try predefined path / os.startfile
-    2. If fails, open Start menu, type app name, press Enter
-    3. Verify app launch using Moondream
-    """
     resolved_path = predefined_paths.get(path.lower(), path)
+    system = platform.system()
+
     try:
-        os.startfile(resolved_path)
+        if system == "Windows":
+            os.startfile(resolved_path)
+        elif system == "Darwin":  # macOS
+            os.system(f"open -a '{resolved_path}'")
+        elif system == "Linux":
+            os.system(f"xdg-open '{resolved_path}'")
+        else:
+            raise Exception("Unsupported OS")
+
         print(f"✅ Launched {path} via predefined path")
         time.sleep(2)
         return True
+
     except Exception as e:
         print(f"❌ Could not launch {path} via predefined path: {e}")
-        print(f"⚡ Attempting Start Menu fallback...")
+        print(f"⚡ Attempting search fallback...")
 
         try:
-            # Open Start menu (Windows key)
-            pyautogui.press("win")
-            time.sleep(1)
+            if system == "Windows":
+                pyautogui.press("win")
+                time.sleep(1)
+                pyautogui.typewrite(path, interval=0.05)
+                time.sleep(0.5)
+                pyautogui.press("enter")
 
-            # Type the app name
-            pyautogui.typewrite(path, interval=0.05)
-            time.sleep(0.5)
+            elif system == "Darwin":  # macOS Spotlight
+                pyautogui.hotkey("command", "space")
+                time.sleep(1)
+                pyautogui.typewrite(path, interval=0.05)
+                time.sleep(0.5)
+                pyautogui.press("enter")
 
-            # Press Enter
-            pyautogui.press("enter")
-            time.sleep(3)  # give it some time to launch
+            elif system == "Linux":  # Ubuntu GNOME/KDE (Super key opens Activities)
+                pyautogui.press("win")
+                time.sleep(1)
+                pyautogui.typewrite(path, interval=0.05)
+                time.sleep(0.5)
+                pyautogui.press("enter")
+
+            time.sleep(3)
+            return True
 
         except Exception as ex:
-            print(f"❌ Start menu fallback failed for {path}: {ex}")
+            print(f"❌ Fallback failed for {path}: {ex}")
             return False
 
 
 def is_process_running(name):
-    """Check if process is running by name."""
     return any(name.lower() in p.name().lower() for p in psutil.process_iter())
 
 def kill_process(name):
@@ -115,7 +120,6 @@ def kill_process(name):
     return False
 
 def sleep(seconds=None):
-    """Pause execution for N seconds"""
     if seconds is not None:
         time.sleep(seconds)
 

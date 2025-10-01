@@ -1,0 +1,24 @@
+The article "VLM on Edge: Worth the Hype or Just a Novelty?" published on LearnOpenCv.com by Kukil, discusses the potential and practical application of Vision Language Models (VLMs) on edge devices.
+
+It acknowledges Pete Warden's 2018 prediction about a "tiny" future for machine learning but highlights the current demand for VLMs and concerns about computational power and sustainability. The primary aim of the article is to evaluate whether the promised "tiny" future for machine learning has arrived, specifically by 2025 (seven years after Warden's prediction). To do this, it tests VLMs on edge devices using a custom Raspberry Pi cluster and Jetson Nano boards.
+
+The objective of this series of blog posts is to identify VLMs that are fast, efficient, and practical for edge deployment, without causing issues like overheating. The article provides details on the "Pi and Nano Cluster Setup" used for testing, which includes:
+
+*   **RPI 2 Model B - 2 GB, No Cooling**
+*   **RPI 4 Model B - 8 GB, No Cooling**
+*   **RPI 5 - 8GB, No Cooling**
+*   **Jetson Nano Devkit 2GB, Heat Sink, No Fan**
+*   **Jetson Nano 4GB, Heat Sink, No Fan**
+*   **Jetson Orin Nano, 8GB (256GB SSD), Heat Sink, With Fan**
+
+All boards, excluding the Jetson Orin Nano, use a 64 GB SD card. Auxiliary components in the build include an ethernet switch and a powering module. The developer boards are used directly, aiming to assess their out-of-the-box performance without additional heat sinks or cooling fans, except where already present.
+
+The article highlights the advantages of building such a custom Raspberry Pi and Jetson Nano cluster for running VLMs, including:
+
+*   Single switch and ethernet connectivity
+*   Easy to monitor and manage
+*   Clean and minimal setup
+*   Scalable architecture
+*   Perfect for experiments
+
+The author also mentions that they will further customize the setup with 3D printed cases, standoffs, and supports, and will discuss the full build with health checkup tools in a future post.

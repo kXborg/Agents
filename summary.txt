@@ -1,3 +1,0 @@
-The screen shows a multi-tasking desktop environment. On the left, the WhatsApp application displays "Chats" with a contact named "Kukil Kashyap Borgohain." Below it, a Windows PowerShell window shows a Python script (`agent_pipeline.py`) execution, indicating "Loading checkpoint shards: 100%" and "Done" after generating an action plan.
-
-On the right, a Google Chrome browser plays a YouTube video titled "Disney and Pixar's Hoppers | Teaser Trailer." The video features a large brown bear holding a smaller, lighter-furred creature in its mouth, set in a forest. Several browser tabs are open, including "Inbox," "Digit_Classifier," and "ChatGPT." The bottom taskbar shows various application icons and the system date as 30-09-2025.
