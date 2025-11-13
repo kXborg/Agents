@@ -5,24 +5,20 @@ in textual form.
 import os
 import json
 import requests
-from dotenv import load_dotenv
+from scripts.repo_parser.config.settings import GITHUB_TOKEN, GITHUB_API_BASE, EXCLUDE_EXT
 
-load_dotenv()
-
-TOKEN = os.getenv('GITHUB_TOKEN')
-ROOT_DIR = "https://api.github.com/repos/"
 
 class GitRepoParser:
     def __init__(
             self,
-            github_token: bool = False,
+            github_token: bool = True,
     ):
         #using session object to define default values and persist as well
         self.s = requests.Session()
         if github_token:
-            self.s.headers.update({"Authorization": f"token {TOKEN}"})
-        self.exclude_ext = [".gif", ".jpg",".jpeg", ".png", ".mp4", ".gitignore", ".git",
-                            ".pdf", ".vscode", ".docker", ".docstr", ".docstr.yaml", ".github"]
+            self.s.headers.update({"Authorization": f"Token {GITHUB_TOKEN}"})
+        self.exclude_ext = EXCLUDE_EXT
+        self.api_base = GITHUB_API_BASE
         
     def _is_excluded(self, name: str):
         return any(name.endswith(ext) for ext in self.exclude_ext)
@@ -52,7 +48,7 @@ class GitRepoParser:
         file type along with meta data.
         """
         repo_name = self._get_repo_name(repo_url)
-        contents_url = f"{ROOT_DIR}{repo_name}/git/trees/{branch}?recursive=1"
+        contents_url = f"{self.api_base}{repo_name}/git/trees/{branch}?recursive=1"
         # print(f"Contents URL variable contains: {contents_url}")
         print(f"Fetching directory tree for {repo_name}")
 
@@ -93,7 +89,7 @@ class GitRepoParser:
         return metadata
 
 
-if __name__ == "__main__":
-    parser = GitRepoParser(github_token=True)
-    tree = parser.get_dir_tree("https://github.com/bhomik749/vlm-bench")
-    print(json.dumps(tree, indent = 2))
+# if __name__ == "__main__":
+#     parser = GitRepoParser()
+#     tree = parser.get_dir_tree("https://github.com/kXborg/vlms")
+#     print(json.dumps(tree, indent = 2))

@@ -15,7 +15,6 @@ from playwright.async_api import async_playwright, Page, Browser
 
 load_dotenv()
 
-#another way of implementing browser: Browser | None
 browser = Union[Browser, None] 
 page = Union[Page, None]
 
