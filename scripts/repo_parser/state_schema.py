@@ -35,7 +35,7 @@ class Agent_State(TypedDict):
     parsed_files: List[Dict[str, str]]
 
     # Final summarization or answer from LLM
-    summary: Union[str, None]
+    summary: Annotated[Sequence[BaseMessage], add_messages]
 
     # LLM instance injected into state
     llm: LLM

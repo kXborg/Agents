@@ -1,5 +1,5 @@
 # nodes/summarize_repo_node.py
-from scripts.repo_parser.config.settings import MAX_CHUNKS
+from scripts.repo_parser.config.settings import MAX_CHUNKS, LLM
 
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 
@@ -10,7 +10,7 @@ async def summarize_repo_node(state: dict) -> dict:
     into a multi-chat answer.
     """
 
-    print("Initializing Summarize Repo Node...")
+    print("Initializing Summarize Repo Node...") 
 
     llm = state.get("llm")
     if not llm:
@@ -62,9 +62,10 @@ Relevant Parsed Files:
 
 Now produce a clear, structured response addressing the user's question.
 """)
-
+    # llm = state.get("llm")
+    llm = LLM
     response = await llm.ainvoke([system_msg, human_msg])
-
+    # print(f"Response Variable: {response}")
     new_ai_msg = AIMessage(content=response.content)
 
     return {

@@ -19,5 +19,6 @@ def parse_notebook(raw: str) -> str:
             out.append("## Markdown Cell:\n" + cell.source)
         elif cell.cell_type == "code":
             out.append("## Code Cell:\n" + cell.source)
+    # print(f"Checking Execution of parse_notebook tool: {out}")
 
     return "\n\n".join(out)[:8000]

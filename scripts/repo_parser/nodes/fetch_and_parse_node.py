@@ -60,6 +60,7 @@ async def fetch_and_parse_node(state: dict) -> dict:
 
         if parser_fn:
             try:
+                print("Checking Execution of parser tools")
                 parsed = parser_fn(raw_content)
             except Exception as e:
                 parsed = f"<Error parsing file {path}: {e}>"
@@ -71,7 +72,6 @@ async def fetch_and_parse_node(state: dict) -> dict:
             "ext": ext,
             "parsed": parsed
         })
-
     print(f"Parsed {len(parsed_results)} files.")
 
     return {

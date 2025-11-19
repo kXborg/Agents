@@ -37,7 +37,7 @@ def parse_python(raw: str) -> str:
         if isinstance(node, ast.ClassDef):
             classes.append(node.name)
             docstrings[node.name] = ast.get_docstring(node) or ""
-
+    
     summary = []
 
     if imports:
@@ -56,6 +56,7 @@ def parse_python(raw: str) -> str:
                 summary.append(f"### {name}\n{doc}\n")
 
     # Return readable summary
+    # print(f"Summary Debug 2: {summary}")
     return "\n".join(summary) or _clean_raw_python(raw)
 
 

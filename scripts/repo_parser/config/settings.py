@@ -17,7 +17,7 @@ GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 GITHUB_API_BASE = "https://api.github.com/repos/"
-GITHUB_RAW_BASE = "https://raw.githubusercontent.com/"
+GITHUB_API_RAW = "https://raw.githubusercontent.com/"
 
 # constants
 MAX_SIZE_KB = 500

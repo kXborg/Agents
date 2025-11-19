@@ -22,7 +22,7 @@ async def run(repo_url: str):
         "selected_files": [],
         "skipped_files": [],
         "parsed_files": [],
-        "summary": None,
+        "summary": [],
         "llm": LLM,
     }
 
@@ -34,20 +34,17 @@ async def run(repo_url: str):
         print(f"Node executed: {node_name}")
 
         # Optionally print the node's output
-        updated_state = step[node_name]
-        if "messages" in updated_state:
-            last_msg = updated_state["messages"][-1]
-            print(f"  Message: {last_msg.content if hasattr(last_msg, 'content') else last_msg}")
+        # updated_state = step[node_name]
+        # if "messages" in updated_state:
+        #     last_msg = updated_state["messages"][-1]
+            # print(f"Message: {last_msg.content if hasattr(last_msg, 'content') else last_msg}")
 
     print("\nFinished processing repo.\n")
-    # print(f"Summary state: {state['summary']}")
-    # FINAL OUTPUT
+    print(f"State Variable: {state}")
     if state.get("summary"):
         print("FINAL SUMMARY:\n")
-        print(state["summary"])
     else:
         print("No summary generated.")
-
 
 if __name__ == "__main__":
     # Expect repo URL as CLI argument
