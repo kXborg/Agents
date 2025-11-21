@@ -266,7 +266,7 @@ async def scroll_decision_node(state: AgentState) -> AgentState:
 
     return {**state,
             "messages": state["messages"]
-            + [SystemMessage(content=f"{tool_result}  (Δy = {moved}px)")]}
+            + [SystemMessage(content=f"{tool_result}  (dy = {moved}px)")]}
 
 
 
