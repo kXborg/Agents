@@ -3,7 +3,11 @@ from datetime import datetime
 schema = {
     "name": "get_datetime",
     "description": "Returns current date and time",
-    "parameters": {}
+    "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+    }
 }
 
 def get_datetime():

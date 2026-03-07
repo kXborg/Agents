@@ -16,11 +16,11 @@ class ToolRegistry:
 
             name = schema["name"]
 
-            self.__schemas.append(schema)
-            self.__functions[name] = function
+            self._schemas.append(schema)
+            self._functions[name] = function
 
     def get_schemas(self):
         return self._schemas
 
     def get_function(self, name):
-        return self.__functions.get(name)
+        return self._functions.get(name)
