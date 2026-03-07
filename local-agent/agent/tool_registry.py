@@ -1,0 +1,26 @@
+from tools.datetime_tool import TOOL as DATETIME_TOOL
+
+class ToolRegistry:
+    def __init__(self):
+        self._schemas = []
+        self._functions = {}
+        self._load_tools()
+    
+    def _load_tools(self):
+
+        tools = [DATETIME_TOOL]
+
+        for tool in tools:
+            schema = tool["schema"]
+            function = tool["function"]
+
+            name = schema["name"]
+
+            self.__schemas.append(schema)
+            self.__functions[name] = function
+
+    def get_schemas(self):
+        return self._schemas
+
+    def get_function(self, name):
+        return self.__functions.get(name)
