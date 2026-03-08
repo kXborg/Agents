@@ -1,5 +1,7 @@
 from tools.datetime_tool import TOOL as DATETIME_TOOL
 from tools.calculator import TOOL as CALCULATOR_TOOL
+from tools.file_reader import TOOL as FILE_READER_TOOL
+from tools.directory_lister import TOOL as DIR_LISTER_TOOL
 
 class ToolRegistry:
     def __init__(self):
@@ -9,7 +11,7 @@ class ToolRegistry:
     
     def _load_tools(self):
 
-        tools = [DATETIME_TOOL, CALCULATOR_TOOL]
+        tools = [DATETIME_TOOL, CALCULATOR_TOOL, FILE_READER_TOOL, DIR_LISTER_TOOL]
 
         for tool in tools:
             schema = tool["schema"]
