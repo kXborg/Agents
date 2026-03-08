@@ -16,15 +16,26 @@ class LMStudioClient:
         payload = {
             "model": MODEL_NAME,
             "messages": messages,
-            "functions": schemas,
             "temperature": TEMPERATURE,
             "max_tokens": MAX_TOKENS,
         }
+
+        if schemas:
+            payload["tools"] = [
+                {"type": "function", "function": s} for s in schemas
+            ]
+
+        # Debug payload
+        print("\nPAYLOAD SENT TO LLM:")
+        print(payload)
 
         response = requests.post(self.url, json=payload)
 
         response.raise_for_status()
 
         data = response.json()
+
+        print("\nRAW MODEL RESPONSE:")
+        print(data)
 
         return data["choices"][0]["message"]

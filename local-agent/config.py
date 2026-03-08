@@ -1,4 +1,4 @@
-LMSTUDIO_BASE_URL = "http://localhost:1234"
+LMSTUDIO_BASE_URL = "http://192.168.1.11:1234"
 
 CHAT_COMPLETIONS_ENDPOINT = "/v1/chat/completions"
 

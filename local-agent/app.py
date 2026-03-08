@@ -5,7 +5,10 @@ from llm.lmstudio_client import LMStudioClient
 def main():
     registry = ToolRegistry()
     llm_client = LMStudioClient()
-    agent = Agent(llm_client, registry)
+
+    # Get LLM endpoint connector, Tool loader (registry), and System Prompt 
+    # (comes from __init__ of Agent class)
+    agent = Agent(llm_client, registry) # Agent initialized
 
     print("Agent is ready. Type 'exit' to end the conversation.")
 

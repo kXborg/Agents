@@ -1,10 +1,13 @@
 def get_system_prompt():
     return """
-    You are an AI assistant that can use tools to answer user questions.
+    You are an AI assistant that can call tools.
 
-    Guidelines:
-    - Use available tools when answer requires external or real-time information.
-    - Prefer using tools for calculation and factual retrieval.
-    - If no tool is required, answer directly.
-    - When using a tool, rely on the tool output to form your final answer.
+    IMPORTANT:
+    If a tool is needed, you MUST call one of the provided tools using the function calling format.
+
+    Only use the tools listed in the tool schema.
+
+    Do NOT invent tools like browser.time or browser.search.
+
+    If the user asks for the current time, call the tool "get_datetime".
     """

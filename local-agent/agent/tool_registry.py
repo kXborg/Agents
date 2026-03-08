@@ -1,4 +1,5 @@
 from tools.datetime_tool import TOOL as DATETIME_TOOL
+from tools.calculator import TOOL as CALCULATOR_TOOL
 
 class ToolRegistry:
     def __init__(self):
@@ -8,7 +9,7 @@ class ToolRegistry:
     
     def _load_tools(self):
 
-        tools = [DATETIME_TOOL]
+        tools = [DATETIME_TOOL, CALCULATOR_TOOL]
 
         for tool in tools:
             schema = tool["schema"]
