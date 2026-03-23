@@ -1,8 +1,9 @@
 from strands import Agent, tool
 from strands.models import BedrockModel
+from datetime import datetime
 
 model = BedrockModel(
-    model_id = "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    model_id = "us.anthropic.claude-sonnet-4-6",
     region_name = "us-east-1",
     temperature = 0.7,
     max_tokens = 1024,
@@ -63,19 +64,29 @@ def get_largest_expense() -> str:
     return f"Largest: ₹{largest['amount']:.2f} on {largest['category']} ({largest['description']})"
 
 
+@tool
+def get_datetime() -> str:
+    """Get the current date and time.
+
+    Returns:
+        The current date and time formatted as 'YYYY-MM-DD HH:MM:SS'
+    """
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
 agent = Agent(
     model=model,
-    tools=[add_expense, get_spending_summary, get_largest_expense])
+    tools=[add_expense, get_spending_summary, get_largest_expense, get_datetime])
 
 if __name__ == "__main__":
     agent("""
-I had the following expenses this week:
-- ₹500 on groceries
-- ₹150 on coffee at Starbucks
-- ₹800 on my AWS bill
-- ₹300 on Ola to the airport
-- ₹4500 on a flight ticket
+            I had the following expenses this week:
+            - ₹500 on groceries
+            - ₹150 on coffee at Starbucks
+            - ₹800 on my AWS bill
+            - ₹300 on Ola to the airport
+            - ₹4500 on a flight ticket
 
-Please add all of these, then show me a spending summary
-and tell me my largest single expense.
-""")
+            Please add all of these, then show me a spending summary
+            and tell me my largest single expense. Also show date and time.
+        """)
